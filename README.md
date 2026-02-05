@@ -77,3 +77,30 @@ sequenceDiagram
     Cleanup->>DB: Mark deployment as cleaned
 
 ```
+
+--- 
+
+## Why a GitHub App?
+
+An early version of this design explored using GitHub Actions to handle preview deploys. Further analysis showed that approach breaks down at scale due to:
+
+- Concurrency limits
+- Poor support for long-lived, stateful workflows
+- Complex cleanup and orphan handling
+
+A GitHub App provides:
+
+- Better scalability
+- Clear ownership of preview lifecycle management
+- More flexible state handling
+- Cleaner separation between CI and environment orchestration
+
+Additional details are captured in `/docs/decisions/01-github-app.md`.
+
+---
+
+## Status
+
+- Architecture and core flow defined
+- GitHub App webhook handling in progress
+- Deployment orchestration under active development
