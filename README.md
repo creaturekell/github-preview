@@ -19,29 +19,37 @@ Before deploying to production, engineers benefit from seeing their changes live
 
 ---
 
-# Requirements 
+## Requirements
 
-1. Create a developer experience that involves an engineering executing a /preview command in github that kicks off the deploy to a preview environment and then provides a preview-url to the engineer.
+1. **Developer Experience**  
+   Engineers trigger preview deployments via a `/preview` comment on a GitHub PR.
 
-2. After the preview is comlpeted, clean-up after one-self
+2. **Automatic Cleanup**  
+   Preview environments must clean up after themselves to avoid unnecessary infrastructure cost.
 
-3. Additional scenerios to consider, 50 PR /preview requests at a time.  
+3. **Scalability**  
+   The system should handle bursts of activity (e.g., ~50 concurrent PR preview requests).
 
-4. Partial prview deploys, where a container might orphaned, how do you handle that to prevent unnecessary costs. 
+4. **Failure & Orphan Handling**  
+   Partial or failed deployments may leave orphaned resources; these must be detected and cleaned up safely.
 
+---
 
-# Architecture Overview 
+## Architecture Overview 
 
-See /docs/descisions for design descisions
+Design decisions and tradeoffs are documented in `/docs/decisions`.
 
-1. Hello World App - Simple Python static site container
-2. Preview GitHub App Service  - Webhook server that listens for /preview command
-3. Deployment Orchestrator - Manages GKE deployments and generates preview URLs
-4. Cleanup Service - Handles cleanup and orphan detection
+### Core Components
 
+1. Hello World App - A simple containerized Python application used as the preview workload.
+2. Preview GitHub App Service  - A GitHub App that listens to webhook events and responds to `/preview` commands on pull requests.
+3. Deployment Orchestrator - Responsible for provisioning preview environments in GKE and generating preview URLs.
+4. Cleanup Service - HPeriodically scans for expired or orphaned preview environments and removes them.
+5. State Store -  Tracks preview deployments, ownership, timestamps, and lifecycle state.
 
+---
 
-## Flow 
+## High-Level Flow 
 
 ```mermaid
 sequenceDiagram
