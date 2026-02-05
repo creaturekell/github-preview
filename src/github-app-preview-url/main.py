@@ -53,7 +53,6 @@ def verify_signature(payload_body, secret_token, signature):
 
     return hmac.compare_digest(expected_signature, signature)
    
-
     
 
 def generate_jwt_token() -> str:
@@ -187,6 +186,33 @@ async def github_webhook(
 
     logger.info(f"Processing /preview command for PR #{pr_number} in {repo_owner}/{repo_name}")
 
+    # Get the PR to extract the commit SHA
+    try:
+        import aiohttp
+        jwt_token = generate_jwt_token()
+
+        async with aiohttp.ClientSession() as session:
+            headers = {
+                "Authorization": f"Bearer {jwt_token}",
+                "Accept": "application/vnd.github.v3+json"
+            }
+            async with session.post(
+                f"https://api.github.com/app/installations/{installation_id}/access_tokens",
+                headers=headers
+            ) as resp:
+                if resp.status != 201:
+                    logger.error(f"Failed to get installation token: {resp.status}")
+                    return JSONResponse(
+                        status_code=200,
+                        content={"message": "Failed to get installation token"}
+                    )
+                token_data = await resp.json()
+                access_token = token_data.get("token")
+
+    except Exception as e:
+        logger.error(f"Error getting PR details: {e}")
+
+
     return {"message": "webhook received"}
 
 @app.get("/")
@@ -198,3 +224,14 @@ async def root():
 async def health():
     return {"status": "healthy"}
 
+if __name__ == "__main__":
+    import uvicorn
+
+    port = int(os.getenv("PORT", "8000"))
+    uvicorn.run(
+        "main:app", 
+        host="0.0.0.0", 
+        port=port,
+        log_level="info",
+        reload=os.getenv("DEBUG","false").lower() == "true"
+    )
