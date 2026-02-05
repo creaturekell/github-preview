@@ -1,14 +1,14 @@
-# Github PR Preview 
+# Github PR Deploy Preview
 
 # Requirements 
 
-1. Create a developer experience that involves an engineering executing a /deploy command in github that kicks off the deploy and then provides a preview-url to the engineer.
+1. Create a developer experience that involves an engineering executing a /preview command in github that kicks off the deploy to a preview environment and then provides a preview-url to the engineer.
 
-2. After the preview is comlpete, clean-up after one-self
+2. After the preview is comlpeted, clean-up after one-self
 
-3. Additional scenerios to consider, 50 /deploy requests at a time.  How would you clean up.
+3. Additional scenerios to consider, 50 PR /preview requests at a time.  
 
-4. Partial deploys, where a container might orphaned, how do you handle that to prevent unnecessary costs. 
+4. Partial prview deploys, where a container might orphaned, how do you handle that to prevent unnecessary costs. 
 
 
 # Architecture Overview 
@@ -16,7 +16,7 @@
 See /docs/descisions for design descisions
 
 1. Hello World App - Simple Python static site container
-2. Preview GitHub App Service  - Webhook server that listens for /deploy commands
+2. Preview GitHub App Service  - Webhook server that listens for /preview command
 3. Deployment Orchestrator - Manages GKE deployments and generates preview URLs
 4. Cleanup Service - Handles cleanup and orphan detection
 
