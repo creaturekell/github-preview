@@ -11,7 +11,7 @@
 4. Partial deploys, where a container might orphaned, how do you handle that to prevent unnecessary costs. 
 
 
-# Design Overview 
+# Architecture Overview 
 
 See /docs/descisions for design descisions
 
