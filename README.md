@@ -94,7 +94,7 @@ Coming soon....
 ---
 ## Why a GitHub App?
 
-Details are captured in [`/docs/decisions/01-github-app.md`].
+Details are captured in [`/docs/decisions/01-github-app.md`](/docs/decisions/01-github-app.md).
 
 ---
 
