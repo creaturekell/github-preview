@@ -12,7 +12,7 @@ The primary goal is to improve developer confidence and reduce production risk b
 
 Before deploying to production, engineers benefit from seeing their changes live in an isolated environment. The desired developer experience is simple:
 
-1. An engineer comments `/preview` on a pull request
+1. An engineer comments `/preview` on a pull request (chose this over `/deploy` to be explicit that this isn't going to production)
 2. A preview environment is deployed automatically
 3. A preview URL is posted back to the PR
 4. The environment is cleaned up after a fixed TTL
