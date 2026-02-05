@@ -24,7 +24,19 @@ See /docs/descisions for design descisions
 
 ## Flow 
 
-```mermaid 
+test simple mermaid flow diagram
+
+```mermaid
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
+
+sdf
+
+```mermaid
 sequenceDiagram
     participant Engineer
     participant GitHub
