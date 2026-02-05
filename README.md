@@ -35,16 +35,17 @@ Before deploying to production, engineers benefit from seeing their changes live
 
 ---
 
-## Architecture Overview 
+## Architecture  
 
 Design decisions and tradeoffs are documented in `/docs/decisions`.
+
 
 ### Core Components
 
 | Service                                              | Description 
 | ---------------------------------------------------- | ------------- |
 | helloworld |  A simple containerized Python application used as the preview workload. |
-| github-app | A GitHub App that listens to webhook events and responds to `/preview` commands on pull requests. |
+| githubapp | A GitHub App that listens to webhook events and responds to `/preview` commands on pull requests. |
 | deployer | A Deployment Orchestrator - Responsible for provisioning preview environments in GKE and generating preview URLs. |
 | cleanup | Periodically scans for expired or orphaned preview environments and removes them. |
 | statestore | Tracks preview deployments, ownership, timestamps, and lifecycle state. |
@@ -63,9 +64,9 @@ sequenceDiagram
     participant Cleanup as Cleanup Service
     participant DB as State Database
 
-    Engineer->>GitHub: Comments "/deploy" on PR
+    Engineer->>GitHub: Comments "/preview" on PR
     GitHub->>GitHubApp: Webhook (issue_comment event)
-    GitHubApp->>GitHubApp: Validate /deploy command
+    GitHubApp->>GitHubApp: Validate /preview command
     GitHubApp->>DB: Create deployment record
     GitHubApp->>Deployer: Queue deployment request
     Deployer->>GKE: Create namespace, deployment, service
@@ -81,7 +82,16 @@ sequenceDiagram
 ```
 
 --- 
+## Screenshots
 
+Will eventually add screenshots or video here.
+
+---
+## Quickstart
+
+Coming soon....
+
+---
 ## Why a GitHub App?
 
 An early version of this design explored using GitHub Actions to handle preview deploys. Further analysis showed that approach breaks down at scale due to:
