@@ -92,7 +92,8 @@ Will eventually add screenshots or video here.
 ---
 ## Quickstart
 
-Coming soon....
+1. [Setup](/src/setupgke/README.md) preview Google Cloud Kubernetes Cluster 
+
 
 ---
 ## Why a GitHub App?
