@@ -104,5 +104,8 @@ Details are captured in [`/docs/decisions/01-github-app.md`](/docs/decisions/01-
 
 - Architecture and core flow defined
 - Python helloworld app created for the simulated app to deploy
-- GitHub App webhook handling in progress
-- Deployment orchestration under active development
+- GitHub App webhook handling to process /preview and post a comment in the PR that "Deployment requested! Setting up preview environment..."
+
+- In Progress: Cleaning up the githubapp, there is a lot of extra code that was added while troubleshooting 403 error because of the installation_id not working.  Resolved by installing the app and enabling write permissions for pull request in addition to issue write permissions.
+
+- Next: Setup initial GKE preview environment 
