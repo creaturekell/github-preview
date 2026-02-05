@@ -1,46 +1,77 @@
-# GitHub App
+# Design Decision: GitHub App for Preview Deploys
 
-Date: 2026-02-04 
+Date: 2026-02-04  
+Status: Accepted
 
-Status: accepted
+## Context
 
-## Context 
+Before a developer deploys to production, having a preview URL turns *“I think this works”* into *“anyone can see this works.”* Preview environments reduce risk, improve collaboration, and increase confidence in changes before they reach production.
 
-Before a developer deploys something to production, having a preview URL turns "I think this works" into "anyone can see this works" will help avoid anything risky hitting production. 
+The desired developer experience is simple:
+- A developer comments `/preview` on a pull request
+- A preview environment is created
+- A URL is returned and attached to the PR
+- The preview environment is automatically torn down after a fixed TTL
 
-The developer should be able to issue a /deploy comment to trigger the workflow to deploy and get a url. 
+### Initial Approach: GitHub Actions
 
-Initially, github actions seemed like the best approach:
-- Simple setup (.github/workflows/<yaml files>)
-- No separate service to deploy
-- Built into Github
+GitHub Actions initially appeared to be the most straightforward solution:
 
-But drawbacks include workflows being limited by GitHub's concurrency limits and orphaned containers would have be handled by another GitHub actions jobs, which makes this option a bit messy.
+- Native integration with GitHub
+- Simple setup using `.github/workflows/*.yml`
+- No separate service to deploy or operate
 
-The alternate approach, using a GitHub App, could integrate with GitHub via API and listens to GitHub webhooks and takes action when /deploy command is issued.
+However, deeper analysis revealed several drawbacks:
 
-Pros include:
-1) The app could run continously and handle much more load than GitHub Actions as it is deployed independently. 
-2) It can also handle more complex logic and state management
-3) Handling cleanup and managing orphan detection is easir. 
+- GitHub Actions are subject to concurrency and execution limits
+- Managing long-running preview environments is awkward
+- Cleanup and orphaned preview detection would require additional workflows
+- Stateful coordination across many pull requests becomes complex and brittle
 
-The downside is that is requires more setup and complexity, but benefits outweigh this aspect. 
+As scale increases (many PRs, frequent preview deploys), this approach becomes difficult to reason about and maintain.
+
+### Alternative: GitHub App
+
+A GitHub App can integrate with GitHub via the REST API and webhooks, listening for issue comment events and reacting when a `/deploy` command is issued.
+
+Advantages of this approach include:
+
+1. **Scalability**  
+   The app runs continuously and is deployed independently, allowing it to handle significantly more load than GitHub Actions.
+
+2. **Stateful logic**  
+   The service can track active preview environments, TTLs, ownership, and cleanup state in a durable way.
+
+3. **Lifecycle management**  
+   Preview creation, expiration, and orphan detection are easier to model and enforce outside of ephemeral CI jobs.
+
+4. **Clear separation of concerns**  
+   GitHub Actions remain focused on CI, while the app owns preview environment orchestration.
+
+The primary downside is increased setup and operational complexity, but this tradeoff is acceptable given the benefits at scale.
 
 ## Decision
 
-Decided to use GitHub Apps to support /deploy to execute a preview-url.  This would deploy to a preview environment and be torn down after 30 minutes.   Additionally, it better support scalability of lots of PRs, removing the barrier for engineers to deliver. 
+Use a **GitHub App** to handle `/preview` commands and manage preview deployments.
 
-## Consequences 
+When a `/preview` comment is posted on a pull request:
+- The GitHub App receives the webhook event
+- A preview environment is created
+- A preview URL is posted back to the PR
+- The environment is automatically torn down after 30 minutes
 
+This approach better supports high PR volume, reduces operational risk, and removes friction for engineers delivering changes.
 
+## Consequences
 
+### Positive
+- Scales to many concurrent preview environments
+- Clear ownership of preview lifecycle management
+- Easier cleanup and orphan detection
+- Improved developer experience and faster feedback loops
+- Extendable, a GitHub App allows future capabilities to more easily be incorporated.
 
-
-
-
-
-
-Deploying a web application to production on a regular basis requ
-
-
-Initially, I proposed github actions that would essentailly react to a comment when /deploy is used.  
+### Negative
+- Requires operating an additional service
+- More initial setup compared to GitHub Actions
+- Increased responsibility for security and credential management
