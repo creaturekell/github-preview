@@ -49,4 +49,4 @@ sequenceDiagram
     Cleanup->>GKE: Delete namespace + resources
     Cleanup->>DB: Mark deployment as cleaned
 
-    ```
+```
