@@ -26,6 +26,14 @@ See /docs/descisions for design descisions
 
 ```mermaid
 sequenceDiagram
+    participant Engineer
+    participant GitHub
+    participant GitHubApp as GitHub App Service
+    participant Deployer as Deployment Orchestrator
+    participant GKE
+    participant Cleanup as Cleanup Service
+    participant DB as State Database
+
     Engineer->>GitHub: Comments "/deploy" on PR
     GitHub->>GitHubApp: Webhook (issue_comment event)
     GitHubApp->>GitHubApp: Validate /deploy command
@@ -40,4 +48,5 @@ sequenceDiagram
     Cleanup->>DB: Query deployments > 30min old
     Cleanup->>GKE: Delete namespace + resources
     Cleanup->>DB: Mark deployment as cleaned
+
     ```
