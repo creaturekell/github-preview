@@ -30,6 +30,7 @@
 
     To testing out that the application deployment works.  This will eventually be executed by the deployer that would be called when a /preview is put in a PR comment and the GitHubApp queues up the deployment.
 
+
    ```bash
    kubectl apply -f ./release/placeholder-kub-manifests.yaml
    ``` 
@@ -45,7 +46,7 @@
 4. Access the frontend in a browser using the the frontend's external IP.
 
  ```bash
- kubectl get service frontend-external | awk '{print $4"}'
+ kubectl get service preview-ip | awk '{print $4"}'
  ```
 
 5. Congrats!
@@ -58,5 +59,7 @@
    ```
 
    Deleting the cluster may take a few minutes.
+
+7. Looking to augment this demo by adding additional service, here are the instructions...
 
 

@@ -1,6 +1,6 @@
 # Github PR Deploy Preview
 
-This repository explores the design and early implementation of a **preview deploy service** that allows engineers to spin up ephemeral preview environments directly from a GitHub pull request.
+This repository explores the design and early implementation of a **preview deploy service** that allows engineers to deploy to an ephemeral preview environment directly from a GitHub pull request.
 
 The primary goal is to improve developer confidence and reduce production risk by making changes visible and testable before merge.
 
@@ -13,7 +13,7 @@ The primary goal is to improve developer confidence and reduce production risk b
 Before deploying to production, engineers benefit from seeing their changes live in an isolated environment. The desired developer experience is simple:
 
 1. An engineer comments `/preview` on a pull request (chose this over `/deploy` to be explicit that this isn't going to production)
-2. A preview environment is deployed automatically
+2. Changes are deployed to a preview environment automatically
 3. A preview URL is posted back to the PR
 4. The environment is cleaned up after a fixed TTL
 
@@ -111,3 +111,12 @@ Details are captured in [`/docs/decisions/01-github-app.md`](/docs/decisions/01-
 - In Progress: Cleaning up the githubapp, there is a lot of extra code that was added while troubleshooting 403 error because of the installation_id not working.  Resolved by installing the app and enabling write permissions for pull request in addition to issue write permissions.
 
 - Next: Setup initial GKE preview environment 
+
+
+## Future considerations
+
+- multiple apps are required for the preview
+- rate limiting and communication back to the developer on when their preview will be deployed
+- observability
+- class of service, are some /previews more important then others
+ 
