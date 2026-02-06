@@ -104,29 +104,36 @@ Details are captured in [`/docs/decisions/01-github-app.md`](/docs/decisions/01-
 
 ## Status
 
+### Done:
 - Architecture and core flow defined
 - Python helloworld app created for the simulated app to deploy
 - GitHub App webhook handling to process /preview and post a comment in the PR that "Deployment requested! Setting up preview environment..."
+- Refactor and modularize githubapp 
 
-- In Progress: Cleaning up the githubapp, there is a lot of extra code that was added while troubleshooting 403 error because of the installation_id not working.  Resolved by installing the app and enabling write permissions for pull request in addition to issue write permissions.
+### Wip:
+
+- Setup initial GKE preview environment and manually perform deploy steps of helloworld 
+    - Build Docker Image(s)
+    - Publish Docker Image to container registry
+    - Build helm chart
+    - Deploy helm chart
+    - Get preview URL
 
 ### Next: 
-1. Setup initial GKE preview environment 
-2. Build Docker Image(s)
-3. Publish Docker Image to container registry
-4. Build helm chart
-5. Deploy helm chart
-6. Get preview URL
+
+
 7.  ok, manually steps work, now automate...
 
 
 
-## Potential ideas.
+# Potential ideas.
 
 - rate limiting and communication back to the developer on when their preview will be deployed
 - observability
 - class of service, are some /previews more important then others
-- SRE practices
+- service mesh
+- fluxCD or ConfigSync 
+- Running kafka on Kubernetes
 
 
 
