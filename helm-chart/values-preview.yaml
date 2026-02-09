@@ -1,0 +1,73 @@
+# Values file for preview environments (PR-based deployments)
+# This file is optimized for GKE preview environments with wildcard DNS
+
+# Image configuration
+projectId: <your-project-id>
+image:
+  repository: us-central1-docker.pkg.dev 
+  name: docker-repo/helloworld 
+  tag: "latest" #Change this to use PR number and commit SHA when deployer script is implemented, e.g., "pr-123-abc123"
+  pullPolicy: IfNotPresent
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 8080
+
+# Ingress configuration for GKE
+ingress:
+  enabled: true
+  className: "gce"
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    # Using static IP in GCP for preview environment
+    kubernetes.io/ingress.global-static-ip-name: "preview-static-ip"
+  hosts:
+    - host: preview-pr-123.pre.chaoticbee.com  # Update with preview hostname pattern
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+# Resource limits
+resources:
+  limits:
+    cpu: 500m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# Single replica for preview
+replicaCount: 1
+
+# Environment variables
+env:
+  - name: PR_NUMBER
+    value: "123"  # Update with actual PR number
+  - name: COMMIT_SHA
+    value: "abc123"  # Update with actual commit SHA
+
+# Health checks
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+# Service account
+serviceAccount:
+  create: true
+  automount: true
