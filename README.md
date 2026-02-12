@@ -22,16 +22,20 @@ Before deploying to production, engineers benefit from seeing their changes live
 ## Requirements
 
 1. **Developer Experience**  
-   Engineers trigger preview deployments via a `/preview` comment on a GitHub PR.
+   - Engineers trigger preview deployments via a `/preview` comment on a GitHub PR.
+   - preview url return within seconds, not minutes.
+   - if it takes minutes to spin up, communicate back to the engineer on status
 
 2. **Automatic Cleanup**  
    Preview environments must clean up after themselves to avoid unnecessary infrastructure cost.
+   Preview environments available for 4 hours or when PR is closed
 
 3. **Scalability**  
    The system should handle bursts of activity (e.g., ~50 concurrent PR preview requests).
 
 4. **Failure & Orphan Handling**  
    Partial or failed deployments may leave orphaned resources; these must be detected and cleaned up safely.
+   
 5. **Security**
    Prevent access to folks external to the company.  
 
