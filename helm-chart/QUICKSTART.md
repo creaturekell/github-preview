@@ -72,19 +72,19 @@ For production-like previews with specific domains:
 
 #### Option 3: Using Google Cloud DNS (Recommended for Existing Domains)
 
-If you have an existing domain (e.g., `chaoticbee.com` from Namecheap) and want GCP to handle DNS:
+If you have an existing domain (e.g., `yourhostname` from Namecheap) and want GCP to handle DNS:
 
 > **📖 Detailed Guide:** See [`DNS-SETUP-NAMECHEAP.md`](./DNS-SETUP-NAMECHEAP.md) for a complete step-by-step guide with Namecheap-specific instructions.
 
 **Option 3a: Use a Subdomain (Recommended)**
 
-Use a subdomain like `preview.chaoticbee.com` so you don't affect your main domain:
+Use a subdomain like `preview.yourhostname` so you don't affect your main domain:
 
 1. **Create a managed zone for the subdomain:**
    ```bash
    gcloud dns managed-zones create preview-chaoticbee-zone \
-     --dns-name=preview.chaoticbee.com \
-     --description="Preview environments for chaoticbee.com" \
+     --dns-name=preview.yourhostname \
+     --description="Preview environments for yourhostname" \
      --project=${PROJECT_ID}
    ```
 
@@ -105,7 +105,7 @@ Use a subdomain like `preview.chaoticbee.com` so you don't affect your main doma
 
 3. **Update Namecheap to use these nameservers:**
    - Log in to Namecheap
-   - Go to **Domain List** → Select **chaoticbee.com** → Click **Manage**
+   - Go to **Domain List** → Select **yourhostname** → Click **Manage**
    - Go to **Advanced DNS** tab
    - Scroll to **Nameservers** section
    - Select **Custom DNS**
@@ -115,7 +115,7 @@ Use a subdomain like `preview.chaoticbee.com` so you don't affect your main doma
 
 4. **Wait for DNS propagation** (verify nameservers are updated):
    ```bash
-   dig NS preview.chaoticbee.com
+   dig NS preview.yourhostname
    # Should show the Google Cloud DNS nameservers
    ```
 
@@ -129,7 +129,7 @@ Use a subdomain like `preview.chaoticbee.com` so you don't affect your main doma
 
 6. **Create wildcard A record** for preview environments:
    ```bash
-   gcloud dns record-sets create "*.preview.chaoticbee.com" \
+   gcloud dns record-sets create "*.preview.yourhostname" \
      --rrdatas=${INGRESS_IP} \
      --type=A \
      --ttl=300 \
@@ -144,18 +144,18 @@ Use a subdomain like `preview.chaoticbee.com` so you don't affect your main doma
      --project=${PROJECT_ID}
    
    # Test DNS resolution
-   dig preview-demo.preview.chaoticbee.com
+   dig preview-demo.preview.yourhostname
    ```
 
 **Option 3b: Use Root Domain (Advanced)**
 
-If you want to use the root domain `chaoticbee.com` directly:
+If you want to use the root domain `yourhostname` directly:
 
 1. **Create a managed zone for the root domain:**
    ```bash
    gcloud dns managed-zones create chaoticbee-zone \
-     --dns-name=chaoticbee.com \
-     --description="DNS zone for chaoticbee.com" \
+     --dns-name=yourhostname \
+     --description="DNS zone for yourhostname" \
      --project=${PROJECT_ID}
    ```
 
@@ -169,7 +169,7 @@ If you want to use the root domain `chaoticbee.com` directly:
 4. **Recreate essential DNS records** in Google Cloud DNS:
    ```bash
    # Example: If you had an A record for www
-   gcloud dns record-sets create "www.chaoticbee.com" \
+   gcloud dns record-sets create "www.yourhostname" \
      --rrdatas=<your-existing-ip> \
      --type=A \
      --ttl=300 \
@@ -177,7 +177,7 @@ If you want to use the root domain `chaoticbee.com` directly:
      --project=${PROJECT_ID}
    
    # Example: If you had MX records for email
-   gcloud dns record-sets create "chaoticbee.com" \
+   gcloud dns record-sets create "yourhostname" \
      --rrdatas="10 mail.example.com." \
      --type=MX \
      --ttl=300 \
@@ -189,7 +189,7 @@ If you want to use the root domain `chaoticbee.com` directly:
    ```bash
    INGRESS_IP=$(kubectl get ingress -n preview-demo -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
    
-   gcloud dns record-sets create "*.preview.chaoticbee.com" \
+   gcloud dns record-sets create "*.preview.yourhostname" \
      --rrdatas=${INGRESS_IP} \
      --type=A \
      --ttl=300 \
@@ -213,10 +213,10 @@ If you want to use the root domain `chaoticbee.com` directly:
      namespace: preview-demo
    spec:
      domains:
-       - "*.preview.chaoticbee.com"  # Wildcard for all previews (recommended)
+       - "*.preview.yourhostname"  # Wildcard for all previews (recommended)
        # Or specific domains:
-       # - preview-demo.preview.chaoticbee.com
-       # - preview-pr-123.preview.chaoticbee.com
+       # - preview-demo.preview.yourhostname
+       # - preview-pr-123.preview.yourhostname
    EOF
    ```
 
@@ -324,7 +324,7 @@ helm install preview-release . \
   --create-namespace \
   --set image.repository=us-central1-docker.pkg.dev/${PROJECT_ID}/docker-repo/helloworld \
   --set image.tag=latest \
-  --set ingress.hosts[0].host=preview-demo.pre.chaoticbee.com \
+  --set ingress.hosts[0].host=preview-demo.pre.yourhostname \
   --set ingress.hosts[0].paths[0].path=/ \
   --set ingress.hosts[0].paths[0].pathType=Prefix
 ```
@@ -346,7 +346,7 @@ helm install preview-release . \
    
    ingress:
      hosts:
-       - host: preview-pr-123.pre.chaoticbee.com  # Your preview hostname
+       - host: preview-pr-123.pre.yourhostname  # Your preview hostname
    
    env:
      - name: PR_NUMBER
@@ -371,7 +371,7 @@ helm install preview-pr-123 . \
   --create-namespace \
   --set image.repository=us-central1-docker.pkg.dev/${PROJECT_ID}/docker-repo/helloworld \
   --set image.tag=pr-123-abc123 \
-  --set ingress.hosts[0].host=preview-pr-123.pre.chaoticbee.com \
+  --set ingress.hosts[0].host=preview-pr-123.pre.yourhostname \
   --set ingress.hosts[0].paths[0].path=/ \
   --set ingress.hosts[0].paths[0].pathType=Prefix \
   --set ingress.className=gce \
