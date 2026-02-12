@@ -51,6 +51,7 @@ Design decisions and tradeoffs are documented in `/docs/decisions`.
 | deployer | A Deployment Orchestrator - Responsible for provisioning preview environments in GKE and generating preview URLs. |
 | cleanup | Periodically scans for expired or orphaned preview environments and removes them. |
 | statestore | Tracks preview deployments, ownership, timestamps, and lifecycle state. |
+| dashboard | Displays the status of previews |
 
 ---
 
@@ -129,10 +130,9 @@ manually steps work, now automate with deployer
 
 - rate limiting and communication back to the developer on when their preview will be deployed
 - observability
-- class of service, are some /previews more important then others
 - service mesh
 - fluxCD or ConfigSync 
-- Running kafka on Kubernetes
+
 
 
 
