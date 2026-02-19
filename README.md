@@ -168,22 +168,26 @@ Will eventually add screenshots or video here.
 
 ### Wip:
 
-manual steps work, now automate with deployer 
+manual steps work, focus on deployer, milestones below
+m1: chose statestore, schema and claim logic
+m2: cloud tasks queue setup 
+m3: update github-app to use enqueue
+m4: deploye worker task handler and peforms helm install
+m5: idempotency and error handling
+m6: deployment and scaling
+m7: documentation 
 
 ### Next: 
 
 
-7. store deployer state and create a dashboard of preview status
-8. create clean-up service 
+7. dashboard of preview status
+8. create clean-up service
+9. create scaffolding for services, that incorporate 12factor app factors and observability.
+9. expand complexity of app beyond helloworld
+9. support for launching dependant services
+10. population of initial data into the application
 
 
-
-
-# Potential ideas.
-
-- observability
-- service mesh
-- fluxCD or ConfigSync 
 
 
 
