@@ -17,6 +17,12 @@ class Config:
     GITHUB_WEBHOOK_SECRET = os.getenv("GITHUB_WEBHOOK_SECRET")
     PORT = int(os.getenv("PORT", "8000"))
     DEBUG = os.getenv("DEBUG", "false").lower() == "true"
+
+    # Cloud Tasks (for enqueueing deployment requests)
+    CLOUD_TASKS_PROJECT = os.getenv("CLOUD_TASKS_PROJECT") or os.getenv("GOOGLE_CLOUD_PROJECT")
+    CLOUD_TASKS_LOCATION = os.getenv("CLOUD_TASKS_LOCATION", "us-central1")
+    CLOUD_TASKS_QUEUE = os.getenv("CLOUD_TASKS_QUEUE", "preview-deploy-queue")
+    DEPLOYER_URL = os.getenv("DEPLOYER_URL")
     
     @classmethod
     def validate(cls) -> bool:

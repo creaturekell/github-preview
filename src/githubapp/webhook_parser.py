@@ -62,11 +62,13 @@ class WebhookParser:
             logger.debug("No /preview command found in comment")
             return None
         
+        comment_id = comment.get("id")
         return {
             "pr_number": pr_number,
             "repo_owner": repo_owner,
             "repo_name": repo_name,
             "repository_id": repository_id,
+            "comment_id": comment_id,
             "comment_body": comment_body,
             "command": command
         }
@@ -84,7 +86,7 @@ class WebhookParser:
         if header_value:
             try:
                 potential_id = int(header_value)
-                # Check if it's the repository ID (common mistake)
+                # Check if it's the repository ID
                 if repository_id and potential_id == repository_id:
                     logger.warning(f"Header value {potential_id} matches repository ID, ignoring it")
                 else:
