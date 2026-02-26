@@ -9,6 +9,7 @@ from .config import Config
 from .auth import verify_webhook_signature
 from .webhook_parser import WebhookParser
 from .github_client import GitHubClient
+from .queue_client import enqueue_deployment_task
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -110,7 +111,7 @@ async def github_webhook(
         )
     
     logger.info(f"Processing /preview command for PR #{pr_number} in {repo_owner}/{repo_name}")
-    
+
     # Get PR details to extract commit SHA
     try:
         access_token = await github_client.get_installation_access_token(installation_id)
@@ -124,7 +125,7 @@ async def github_webhook(
                 status_code=200,
                 content={"message": "Failed to get installation token"}
             )
-        
+
         pr_data = await github_client.get_pr_details(repo_owner, repo_name, pr_number, access_token)
         if not pr_data:
             await github_client.post_comment(
@@ -136,7 +137,7 @@ async def github_webhook(
                 status_code=200,
                 content={"message": "Failed to get PR details"}
             )
-        
+
         commit_sha = pr_data.get("head", {}).get("sha")
         if not commit_sha:
             await github_client.post_comment(
@@ -148,27 +149,54 @@ async def github_webhook(
                 status_code=200,
                 content={"message": "Could not get commit SHA"}
             )
-        
+
         logger.info(f"Extracted commit SHA: {commit_sha}")
-        
+
     except Exception as e:
         logger.error(f"Error processing PR: {e}")
         import traceback
         logger.debug(f"Traceback: {traceback.format_exc()}")
-    
-    # Post initial response comment
+        await github_client.post_comment(
+            repo_owner, repo_name, pr_number,
+            "❌ An error occurred while processing the deployment request.",
+            installation_id
+        )
+        return JSONResponse(
+            status_code=200,
+            content={"message": "Error processing PR", "error": str(e)}
+        )
+
+    # Post initial response comment (fast)
     await github_client.post_comment(
         repo_owner, repo_name, pr_number,
         "🚀 Deployment requested! Setting up preview environment...",
         installation_id
     )
-    
+
+    # Enqueue deployment task (non-blocking; Deployer worker will process)
+    repo = f"{repo_owner}/{repo_name}"
+    idempotency_key = f"{repo}#{pr_number}:{commit_sha}"
+    task_payload = {
+        "idempotency_key": idempotency_key,
+        "repo": repo,
+        "pr_number": pr_number,
+        "commit_sha": commit_sha,
+        "installation_id": installation_id,
+        "comment_id": event_data.get("comment_id"),
+    }
+    if not enqueue_deployment_task(task_payload):
+        await github_client.post_comment(
+            repo_owner, repo_name, pr_number,
+            "❌ Failed to queue deployment. Please check server configuration (CLOUD_TASKS_PROJECT, DEPLOYER_URL).",
+            installation_id
+        )
+
     return JSONResponse(
         status_code=200,
         content={
             "message": "Deployment request processed",
             "pr_number": pr_number,
-            "repo": f"{repo_owner}/{repo_name}"
+            "repo": repo
         }
     )
 
